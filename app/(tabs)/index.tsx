@@ -1,11 +1,51 @@
-import { Image, StyleSheet, Platform } from 'react-native';
-
-import { HelloWave } from '@/components/HelloWave';
+import React, { useState } from 'react';
+import {
+  Image,
+  StyleSheet,
+  TextInput,
+  View,
+  TouchableOpacity,
+  Modal,
+  ScrollView,
+} from 'react-native';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
 export default function HomeScreen() {
+  const [search, setSearch] = useState('');
+  const [movies, setMovies] = useState<any[]>([]);
+  const [selectedMovie, setSelectedMovie] = useState<any>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const fetchMovies = async (query: string) => {
+    const baseUrl = 'https://api.themoviedb.org/3/search/movie';
+    const url = `${baseUrl}?query=${encodeURIComponent(query)}&language=pt-BR&page=1&region=pt`;
+
+    const token = process.env.TMDB_API_KEY;
+
+    const options = {
+      method: 'GET',
+      headers: {
+        accept: 'application/json',
+        Authorization: `Bearer ${token?.toString()}`,
+      },
+    };
+
+    try {
+      const response = await fetch(url, options);
+      const json = await response.json();
+      setMovies(json.results || []);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const openMovieDetails = (movie: any) => {
+    setSelectedMovie(movie);
+    setModalVisible(true);
+  };
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
@@ -15,54 +55,84 @@ export default function HomeScreen() {
           style={styles.reactLogo}
         />
       }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
+      <ThemedView style={styles.searchContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Buscar filme por nome..."
+          value={search}
+          onChangeText={setSearch}
+          onSubmitEditing={() => fetchMovies(search)}
+        />
+        <TouchableOpacity
+          onPress={() => fetchMovies(search)}
+          style={styles.searchButton}>
+          <ThemedText>Buscar</ThemedText>
+        </TouchableOpacity>
       </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
+
+      <ThemedView style={styles.moviesContainer}>
+        {movies.length > 0 ? (
+          movies.map((movie) => (
+            <TouchableOpacity
+              key={movie.id}
+              onPress={() => openMovieDetails(movie)}
+              style={styles.movieItem}>
+              <ThemedText>{movie.title}</ThemedText>
+            </TouchableOpacity>
+          ))
+        ) : (
+          <ThemedText>Nenhum filme encontrado</ThemedText>
+        )}
       </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
+
+      <Modal
+        visible={modalVisible}
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}>
+        <ScrollView contentContainerStyle={styles.modalContent}>
+          {selectedMovie && (
+            <>
+              <ThemedText type="title">{selectedMovie.title}</ThemedText>
+              <ThemedText>{selectedMovie.overview}</ThemedText>
+            </>
+          )}
+          <TouchableOpacity
+            onPress={() => setModalVisible(false)}
+            style={styles.closeButton}>
+            <ThemedText>Fechar</ThemedText>
+          </TouchableOpacity>
+        </ScrollView>
+      </Modal>
     </ParallaxScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  searchContainer: {
+    margin: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  input: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 8,
+    borderRadius: 4,
+  },
+  searchButton: {
+    marginLeft: 8,
+    backgroundColor: '#A1CEDC',
+    padding: 8,
+    borderRadius: 4,
+  },
+  moviesContainer: {
+    margin: 16,
+  },
+  movieItem: {
+    padding: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
   },
   reactLogo: {
     height: 178,
@@ -70,5 +140,17 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     position: 'absolute',
+  },
+  modalContent: {
+    padding: 16,
+    flexGrow: 1,
+    justifyContent: 'center',
+  },
+  closeButton: {
+    marginTop: 16,
+    backgroundColor: '#A1CEDC',
+    padding: 8,
+    borderRadius: 4,
+    alignSelf: 'center',
   },
 });
