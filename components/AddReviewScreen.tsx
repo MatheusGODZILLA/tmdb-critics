@@ -23,11 +23,40 @@ const AddReviewScreen: React.FC<AddReviewScreenProps> = ({
   const [reviewDescription, setReviewDescription] = useState('');
   const [reviewRating, setReviewRating] = useState('');
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const ratingNumber = parseFloat(reviewRating);
     if (!reviewTitle || !reviewDescription || isNaN(ratingNumber) || ratingNumber < 0 || ratingNumber > 10) {
       Alert.alert('Erro', 'Preencha todos os campos corretamente. A nota deve estar entre 0 e 10.');
       return;
+    }
+
+    const reviewMovie = {
+      original_title: reviewTitle,
+      vote_average: ratingNumber,
+      description: reviewDescription,
+    }
+
+    try {
+      const response = await fetch('http://localhost:3333/reviews', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(reviewMovie),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Error adding review:', errorData);
+        Alert.alert('Erro', 'Falha ao adicionar resenha. Tente novamente.');
+        return;
+      }
+
+      Alert.alert('Sucesso', 'Resenha adicionada com sucesso!');
+      onClose();
+    } catch (error) {
+      console.error('Network error:', error);
+      Alert.alert('Erro', 'Erro de rede. Verifique sua conexão.');
     }
 
     onSubmit({

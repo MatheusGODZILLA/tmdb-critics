@@ -6,7 +6,7 @@ import {
     View,
     TouchableOpacity,
     ScrollView,
-    Text, // Importando o componente Text padrão
+    Text,
 } from 'react-native';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import MovieDetailsModal from '@/components/MovieDetailsModal';
@@ -18,25 +18,32 @@ export default function HomeScreen() {
     const [modalVisible, setModalVisible] = useState(false);
 
     const fetchMovies = async (query: string) => {
-        const baseUrl = 'https://api.themoviedb.org/3/search/movie';
-        const url = `${baseUrl}?query=${encodeURIComponent(query)}&language=pt-BR&page=1&region=pt`;
-
-        const token = process.env.TMDB_API_KEY;
+        const baseUrl = 'http://localhost:3333/rdbms';
 
         const options = {
-            method: 'GET',
+            method: 'POST',
             headers: {
-                accept: 'application/json',
-                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
             },
+            body: JSON.stringify({ original_title: query }),
         };
 
         try {
-            const response = await fetch(url, options);
+            const response = await fetch(baseUrl, options);
+            if (!response.ok) {
+                console.error('Error fetching movies:', response.status);
+                setMovies([]);
+                return;
+            }
             const json = await response.json();
-            setMovies(json.results || []);
+            if (json) {
+                setMovies(json);
+            } else {
+                setMovies([]);
+            }
         } catch (err) {
-            console.error(err);
+            console.error('Network error:', err);
+            setMovies([]);
         }
     };
 
@@ -47,7 +54,7 @@ export default function HomeScreen() {
 
     return (
         <ParallaxScrollView
-            headerBackgroundColor={{ dark: '#A1CEDC', light: '#A1CEDC' }} // Cor padrão para o cabeçalho
+            headerBackgroundColor={{ dark: '#A1CEDC', light: '#A1CEDC' }}
             headerImage={
                 <Image
                     source={require('@/assets/images/partial-react-logo.png')}
@@ -75,11 +82,11 @@ export default function HomeScreen() {
                 {movies.length > 0 ? (
                     movies.map((movie) => (
                         <TouchableOpacity
-                            key={movie.id}
+                            key={movie.original_title} // Using original_title as key
                             onPress={() => openMovieDetails(movie)}
                             style={styles.movieItem}
                         >
-                            <Text style={styles.movieTitle}>{movie.title}</Text>
+                            <Text style={styles.movieTitle}>{movie.original_title}</Text>
                         </TouchableOpacity>
                     ))
                 ) : (
