@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-    Image,
     StyleSheet,
     TextInput,
     View,
@@ -8,7 +7,6 @@ import {
     ScrollView,
     Text,
 } from 'react-native';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
 import MovieDetailsModal from '@/components/MovieDetailsModal';
 
 export default function HomeScreen() {
@@ -31,18 +29,14 @@ export default function HomeScreen() {
         try {
             const response = await fetch(baseUrl, options);
             if (!response.ok) {
-                console.error('Error fetching movies:', response.status);
+                console.error('Erro ao buscar filmes:', response.status);
                 setMovies([]);
                 return;
             }
             const json = await response.json();
-            if (json) {
-                setMovies(json);
-            } else {
-                setMovies([]);
-            }
+            setMovies(json || []);
         } catch (err) {
-            console.error('Network error:', err);
+            console.error('Erro de rede:', err);
             setMovies([]);
         }
     };
@@ -53,15 +47,13 @@ export default function HomeScreen() {
     };
 
     return (
-        <ParallaxScrollView
-            headerBackgroundColor={{ dark: '#A1CEDC', light: '#A1CEDC' }}
-            headerImage={
-                <Image
-                    source={require('@/assets/images/partial-react-logo.png')}
-                    style={styles.reactLogo}
-                />
-            }
-        >
+        <View style={styles.container}>
+            <Text style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 16, textAlign: 'center' }}>
+                TMDB-CRITCS
+            </Text>
+            <Text style={{ fontSize: 16, marginBottom: 16, textAlign: 'center' }}>
+                Dê sua opinião sobre seus filmes favoritos
+            </Text>
             <View style={styles.searchContainer}>
                 <TextInput
                     style={styles.input}
@@ -82,7 +74,7 @@ export default function HomeScreen() {
                 {movies.length > 0 ? (
                     movies.map((movie) => (
                         <TouchableOpacity
-                            key={movie.original_title} // Using original_title as key
+                            key={movie.original_title}
                             onPress={() => openMovieDetails(movie)}
                             style={styles.movieItem}
                         >
@@ -99,25 +91,26 @@ export default function HomeScreen() {
                 visible={modalVisible}
                 onClose={() => setModalVisible(false)}
             />
-        </ParallaxScrollView>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#F5F5F5',
+        padding: 16,
+    },
     searchContainer: {
-        margin: 10,
         flexDirection: 'row',
         alignItems: 'center',
+        marginBottom: 16,
     },
     input: {
         flex: 1,
-        backgroundColor: '#f0f0f0',
+        backgroundColor: '#fff',
         padding: 12,
         borderRadius: 25,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
         elevation: 2,
         marginRight: 8,
     },
@@ -128,10 +121,6 @@ const styles = StyleSheet.create({
         borderRadius: 25,
         justifyContent: 'center',
         alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
         elevation: 3,
     },
     searchText: {
@@ -139,17 +128,13 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     moviesContainer: {
-        margin: 16,
+        flexGrow: 1,
     },
     movieItem: {
         backgroundColor: '#fff',
         padding: 16,
         borderRadius: 10,
         marginBottom: 10,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
         elevation: 2,
     },
     movieTitle: {
@@ -161,12 +146,5 @@ const styles = StyleSheet.create({
         marginTop: 20,
         fontSize: 16,
         color: '#666',
-    },
-    reactLogo: {
-        height: 178,
-        width: 290,
-        bottom: 0,
-        left: 0,
-        position: 'absolute',
     },
 });
