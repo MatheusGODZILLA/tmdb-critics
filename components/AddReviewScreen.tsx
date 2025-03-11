@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  ScrollView,
+  Image,
 } from 'react-native';
 
 interface AddReviewScreenProps {
@@ -19,7 +21,6 @@ const AddReviewScreen: React.FC<AddReviewScreenProps> = ({
   onClose,
   onSubmit,
 }) => {
-  const [movieTitle, setMovieTitle] = useState('');
   const [reviewTitle, setReviewTitle] = useState('');
   const [reviewDescription, setReviewDescription] = useState('');
   const [reviewRating, setReviewRating] = useState('');
@@ -37,7 +38,7 @@ const AddReviewScreen: React.FC<AddReviewScreenProps> = ({
       original_title: reviewTitle,
       vote_average: ratingNumber,
       description: reviewDescription,
-    }
+    };
 
     try {
       const response = await fetch('http://localhost:3333/reviews', {
@@ -67,94 +68,158 @@ const AddReviewScreen: React.FC<AddReviewScreenProps> = ({
       description: reviewDescription,
       rating: ratingNumber,
     });
-
-    Alert.alert('Sucesso', 'Resenha adicionada com sucesso!');
-    onClose();
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.movieTitle}>{movie.title}</Text>
-      <Text style={styles.movieTitle}>Adicionar Resenha</Text>
+    <View style={styles.modalOverlay}>
+      <ScrollView contentContainerStyle={styles.modalContent}>
+        <View style={styles.container}>
+          <Text style={styles.movieTitle}>Adicionar Resenha</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Título da Resenha"
-        value={reviewTitle}
-        onChangeText={setReviewTitle}
-      />
+          <View style={styles.movieInfo}>
+            <Image
+              source={{ uri: `https://image.tmdb.org/t/p/w500${movie.poster_path}` }}
+              style={styles.moviePoster}
+            />
+            <View style={styles.movieDetails}>
+              <Text style={styles.movieOriginalTitle}>{movie.original_title}</Text>
+              <Text style={styles.movieReleaseDate}>{movie.release_date}</Text>
+            </View>
+          </View>
 
-      <TextInput
-        style={[styles.input, styles.textArea]}
-        placeholder="Descrição"
-        value={reviewDescription}
-        onChangeText={setReviewDescription}
-        multiline
-      />
+          <TextInput
+            style={styles.input}
+            placeholder="Título da Resenha"
+            value={reviewTitle}
+            onChangeText={setReviewTitle}
+          />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Nota (0-10)"
-        keyboardType="numeric"
-        value={reviewRating}
-        onChangeText={setReviewRating}
-      />
+          <TextInput
+            style={[styles.input, styles.textArea]}
+            placeholder="Descrição"
+            value={reviewDescription}
+            onChangeText={setReviewDescription}
+            multiline
+          />
 
-      <TouchableOpacity onPress={handleSubmit} style={styles.submitButton}>
-        <Text style={styles.buttonText}>Salvar Resenha</Text>
-      </TouchableOpacity>
+          <TextInput
+            style={styles.input}
+            placeholder="Nota (0-10)"
+            keyboardType="numeric"
+            value={reviewRating}
+            onChangeText={setReviewRating}
+          />
 
-      <TouchableOpacity onPress={onClose} style={styles.cancelButton}>
-        <Text style={styles.buttonText}>Cancelar</Text>
-      </TouchableOpacity>
+          <TouchableOpacity onPress={handleSubmit} style={styles.submitButton}>
+            <Text style={styles.buttonText}>Salvar Resenha</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={onClose} style={styles.cancelButton}>
+            <Text style={styles.buttonText}>Cancelar</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  modalOverlay: {
     flex: 1,
-    padding: 20,
     justifyContent: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    alignItems: 'center',
+    paddingVertical: 20,
+  },
+  container: {
+    padding: 20,
+    alignItems: 'center',
+    backgroundColor: '#333',
+    borderRadius: 15,
+    elevation: 10,
+    width: '90%',
+    maxWidth: 400,
   },
   movieTitle: {
-    fontSize: 22,
+    fontSize: 28,
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 20,
     color: '#fff',
+    textShadowColor: 'rgba(0, 0, 0, 0.1)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
+  },
+  movieInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  moviePoster: {
+    width: 80,
+    height: 120,
+    borderRadius: 10,
+    marginRight: 15,
+  },
+  movieDetails: {
+    flex: 1,
+  },
+  movieOriginalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  movieReleaseDate: {
+    fontSize: 14,
+    color: '#ccc',
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 10,
-    borderRadius: 8,
+    borderColor: '#555',
+    padding: 14,
+    borderRadius: 10,
     fontSize: 16,
-    marginBottom: 12,
+    marginBottom: 15,
+    backgroundColor: '#444',
+    color: '#fff',
+    width: '100%', // Adicionado para definir a largura dos inputs como 100%
   },
   textArea: {
-    height: 100,
+    height: 120,
     textAlignVertical: 'top',
   },
   submitButton: {
     backgroundColor: '#007BFF',
-    padding: 14,
-    borderRadius: 8,
+    padding: 16,
+    borderRadius: 30,
+    width: '85%',
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 20,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   cancelButton: {
     backgroundColor: '#6C757D',
-    padding: 14,
-    borderRadius: 8,
+    padding: 16,
+    borderRadius: 30,
+    width: '85%',
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 15,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   buttonText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 18,
   },
 });
 
