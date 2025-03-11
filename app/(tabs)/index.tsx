@@ -48,8 +48,8 @@ export default function HomeScreen() {
 
     return (
         <View style={styles.container}>
-            <Text style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 16, textAlign: 'center' }}>
-                TMDB-CRITCS
+            <Text style={{ fontSize: 24, fontWeight: 'bold', marginTop: 48, marginBottom: 16, textAlign: 'center' }}>
+                TMDB-CRITICS
             </Text>
             <Text style={{ fontSize: 16, marginBottom: 16, textAlign: 'center' }}>
                 Dê sua opinião sobre seus filmes favoritos
