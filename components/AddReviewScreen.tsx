@@ -19,6 +19,7 @@ const AddReviewScreen: React.FC<AddReviewScreenProps> = ({
   onClose,
   onSubmit,
 }) => {
+  const [movieTitle, setMovieTitle] = useState('');
   const [reviewTitle, setReviewTitle] = useState('');
   const [reviewDescription, setReviewDescription] = useState('');
   const [reviewRating, setReviewRating] = useState('');
@@ -31,6 +32,8 @@ const AddReviewScreen: React.FC<AddReviewScreenProps> = ({
     }
 
     const reviewMovie = {
+      movie_title: movie.title,
+      poster_path: movie.poster_path,
       original_title: reviewTitle,
       vote_average: ratingNumber,
       description: reviewDescription,
@@ -72,6 +75,7 @@ const AddReviewScreen: React.FC<AddReviewScreenProps> = ({
   return (
     <View style={styles.container}>
       <Text style={styles.movieTitle}>{movie.title}</Text>
+      <Text style={styles.movieTitle}>Adicionar Resenha</Text>
 
       <TextInput
         style={styles.input}
@@ -119,6 +123,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 20,
+    color: '#fff',
   },
   input: {
     borderWidth: 1,
