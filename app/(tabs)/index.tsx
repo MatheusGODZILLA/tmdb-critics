@@ -16,7 +16,7 @@ export default function HomeScreen() {
     const [modalVisible, setModalVisible] = useState(false);
 
     const fetchMovies = async (query: string) => {
-        const baseUrl = 'http://localhost:3333/rdbms';
+        const baseUrl = 'https://filmes-api-1.onrender.com/rdbms';
 
         const options = {
             method: 'POST',

@@ -23,7 +23,7 @@ export default function TabTwoScreen() {
 
   const fetchReviews = async () => {
     try {
-      const response = await fetch('http://localhost:3333/reviews');
+      const response = await fetch('https://filmes-api-1.onrender.com/reviews');
       if (!response.ok) {
         throw new Error('Erro ao buscar críticas');
       }
@@ -37,7 +37,7 @@ export default function TabTwoScreen() {
   const handleSaveReview = async () => {
     if (!selectedReview) return;
     try {
-      const response = await fetch(`http://localhost:3333/reviews/${selectedReview.id}`, {
+      const response = await fetch(`https://filmes-api-1.onrender.com/reviews/${selectedReview.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -58,7 +58,7 @@ export default function TabTwoScreen() {
   const handleDeleteReview = async () => {
     if (!selectedReview) return;
     try {
-      const response = await fetch(`http://localhost:3333/reviews/${selectedReview.id}`, {
+      const response = await fetch(`https://filmes-api-1.onrender.com/reviews/${selectedReview.id}`, {
         method: 'DELETE',
       });
       if (!response.ok) {

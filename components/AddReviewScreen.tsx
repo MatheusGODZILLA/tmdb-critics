@@ -41,7 +41,7 @@ const AddReviewScreen: React.FC<AddReviewScreenProps> = ({
     };
 
     try {
-      const response = await fetch('http://localhost:3333/reviews', {
+      const response = await fetch('https://filmes-api-1.onrender.com/reviews', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
